@@ -1,0 +1,54 @@
+# @format
+
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: bookstore_postgres
+    environment:
+      POSTGRES_DB: bookstore
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bookstore_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d bookstore"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  app:
+    build: .
+    container_name: bookstore_app
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_NAME: bookstore
+      JWT_SECRET: hello_123
+      MIDTRANS_SERVER_KEY: your_midtrans_key
+      GRPC_PORT: 50051
+      HTTP_PORT: 8080
+    ports:
+      - "50051:50051"
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bookstore_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  bookstore_network:
+    driver: bridge
