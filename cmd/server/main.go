@@ -49,13 +49,14 @@ func main() {
 	bookRepo := repository.NewBookRepository(db)
 	orderRepo := repository.NewOrderRepository(db)
 	reportRepo := repository.NewReportRepository(db)
+	txRepo := repository.NewTransactionRepository(db)
 	logger.Info("Repositories initialized")
 
 	// Initialize services
 	userService := service.NewUserService(userRepo)
 	categoryService := service.NewCategoryService(categoryRepo, userRepo)
 	bookService := service.NewBookService(bookRepo, categoryRepo, userRepo)
-	orderService := service.NewOrderService(orderRepo, bookRepo, userRepo)
+	orderService := service.NewOrderService(orderRepo, bookRepo, userRepo, txRepo)
 	reportService := service.NewReportService(reportRepo, userRepo)
 	logger.Info("Services initialized")
 

@@ -10,6 +10,7 @@ import (
 type ReportService interface {
 	GetSalesReport(startDate, endDate time.Time, token string) ([]*repository.SalesReportItem, float64, error)
 	GetTopBooks(limit int, token string) ([]*repository.TopBookItem, error)
+	GetBookPriceStatistics(token string) (*repository.BookPriceStatistics, error)
 }
 
 type reportServiceImpl struct {
@@ -74,4 +75,25 @@ func (s *reportServiceImpl) GetTopBooks(limit int, token string) ([]*repository.
 	
 	logger.Info("Top books retrieval successful", "count", len(topBooks), "limit", limit)
 	return topBooks, nil
+}
+
+// GetBookPriceStatistics retrieves book price statistics with admin authentication
+func (s *reportServiceImpl) GetBookPriceStatistics(token string) (*repository.BookPriceStatistics, error) {
+	logger.Info("Book price statistics request received")
+	
+	// Validate admin token
+	if _, err := s.auth.ValidateAdminToken(token); err != nil {
+		logger.Error("Admin token validation failed", "error", err)
+		return nil, err
+	}
+	
+	// Get book price statistics from repository
+	stats, err := s.reportRepo.GetBookPriceStatistics()
+	if err != nil {
+		logger.Error("Failed to get book price statistics", "error", err)
+		return nil, err
+	}
+	
+	logger.Info("Book price statistics retrieval successful", "total_books", stats.TotalBooks)
+	return stats, nil
 }

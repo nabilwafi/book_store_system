@@ -2,8 +2,10 @@ package grpc
 
 import (
 	"context"
-	"github.com/nabil/book-store-system/internal/transport/dto"
+
 	"github.com/nabil/book-store-system/internal/service"
+	"github.com/nabil/book-store-system/internal/transport/dto"
+	"github.com/nabil/book-store-system/pkg/helpers"
 	"github.com/nabil/book-store-system/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -29,16 +31,16 @@ func (h *CategoryHandler) CreateCategory(ctx context.Context, req *proto.CreateC
 		Name:  req.Name,
 		Token: req.Token,
 	}
-	
+
 	if err := createDTO.ValidateCreateCategoryRequest(); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
 	}
-	
+
 	category, err := h.categoryService.CreateCategory(req.Name, req.Token)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to create category: %v", err)
 	}
-	
+
 	return &proto.CreateCategoryResponse{
 		Success: true,
 		Category: &proto.Category{
@@ -56,16 +58,17 @@ func (h *CategoryHandler) GetCategories(ctx context.Context, req *proto.GetCateg
 		Page:  req.Page,
 		Limit: req.Limit,
 	}
-	
+
 	if err := getCategoriesDTO.ValidateGetCategoriesRequest(); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
 	}
-	
-	categories, total, err := h.categoryService.GetCategories(int(req.Page), int(req.Limit))
+
+	// Use validated DTO values instead of raw request values
+	categories, total, err := h.categoryService.GetCategories(int(getCategoriesDTO.Page), int(getCategoriesDTO.Limit))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to get categories: %v", err)
 	}
-	
+
 	var protoCategories []*proto.Category
 	for _, category := range categories {
 		protoCategories = append(protoCategories, &proto.Category{
@@ -73,12 +76,19 @@ func (h *CategoryHandler) GetCategories(ctx context.Context, req *proto.GetCateg
 			Name: category.Name,
 		})
 	}
-	
+
+	// Calculate pagination metadata using validated DTO values
+	paginationMeta := helpers.CalculatePaginationMetadata(int(getCategoriesDTO.Page), int(getCategoriesDTO.Limit), total)
+
 	return &proto.GetCategoriesResponse{
-		Success:    true,
-		Message:    "Categories retrieved successfully",
-		Categories: protoCategories,
-		Total:      int32(total),
+		Success:     true,
+		Message:     "Categories retrieved successfully",
+		Categories:  protoCategories,
+		Total:       int32(total),
+		CurrentPage: paginationMeta.CurrentPage,
+		TotalPages:  paginationMeta.TotalPages,
+		HasNext:     paginationMeta.HasNext,
+		HasPrevious: paginationMeta.HasPrevious,
 	}, nil
 }
 
@@ -88,16 +98,16 @@ func (h *CategoryHandler) GetCategory(ctx context.Context, req *proto.GetCategor
 	getCategoryDTO := &dto.GetCategoryRequestDTO{
 		ID: req.Id,
 	}
-	
+
 	if err := getCategoryDTO.ValidateGetCategoryRequest(); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
 	}
-	
+
 	category, err := h.categoryService.GetCategory(uint(req.Id))
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Category not found: %v", err)
 	}
-	
+
 	return &proto.GetCategoryResponse{
 		Success: true,
 		Message: "Category retrieved successfully",
@@ -116,16 +126,16 @@ func (h *CategoryHandler) UpdateCategory(ctx context.Context, req *proto.UpdateC
 		Name:  req.Name,
 		Token: req.Token,
 	}
-	
+
 	if err := updateDTO.ValidateUpdateCategoryRequest(); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
 	}
-	
+
 	category, err := h.categoryService.UpdateCategory(uint(req.Id), req.Name, req.Token)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to update category: %v", err)
 	}
-	
+
 	return &proto.UpdateCategoryResponse{
 		Success: true,
 		Category: &proto.Category{
@@ -143,16 +153,16 @@ func (h *CategoryHandler) DeleteCategory(ctx context.Context, req *proto.DeleteC
 		ID:    req.Id,
 		Token: req.Token,
 	}
-	
+
 	if err := deleteDTO.ValidateDeleteCategoryRequest(); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
 	}
-	
+
 	err := h.categoryService.DeleteCategory(uint(req.Id), req.Token)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to delete category: %v", err)
 	}
-	
+
 	return &proto.DeleteCategoryResponse{
 		Success: true,
 		Message: "Category deleted successfully",

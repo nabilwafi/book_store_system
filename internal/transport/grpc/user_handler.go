@@ -2,8 +2,9 @@ package grpc
 
 import (
 	"context"
-	"github.com/nabil/book-store-system/internal/transport/dto"
+
 	"github.com/nabil/book-store-system/internal/service"
+	"github.com/nabil/book-store-system/internal/transport/dto"
 	"github.com/nabil/book-store-system/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -30,16 +31,16 @@ func (h *UserHandler) Register(ctx context.Context, req *proto.RegisterRequest) 
 		Email:    req.Email,
 		Password: req.Password,
 	}
-	
+
 	if err := registerDTO.ValidateRegisterRequest(); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
 	}
-	
+
 	user, err := h.userService.Register(req.Name, req.Email, req.Password)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to register user: %v", err)
 	}
-	
+
 	return &proto.RegisterResponse{
 		Success: true,
 		User: &proto.User{
@@ -59,19 +60,19 @@ func (h *UserHandler) Login(ctx context.Context, req *proto.LoginRequest) (*prot
 		Email:    req.Email,
 		Password: req.Password,
 	}
-	
+
 	if err := loginDTO.ValidateLoginRequest(); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
 	}
-	
+
 	token, user, err := h.userService.Login(req.Email, req.Password)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Login failed: %v", err)
 	}
-	
+
 	return &proto.LoginResponse{
 		Success: true,
-		Token: token,
+		Token:   token,
 		User: &proto.User{
 			Id:    uint32(user.ID),
 			Name:  user.Name,
@@ -88,16 +89,16 @@ func (h *UserHandler) GetProfile(ctx context.Context, req *proto.GetProfileReque
 	getProfileDTO := &dto.GetProfileRequestDTO{
 		Token: req.Token,
 	}
-	
+
 	if err := getProfileDTO.ValidateGetProfileRequest(); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
 	}
-	
+
 	user, err := h.userService.GetProfile(req.Token)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Failed to get profile: %v", err)
 	}
-	
+
 	return &proto.GetProfileResponse{
 		User: &proto.User{
 			Id:    uint32(user.ID),

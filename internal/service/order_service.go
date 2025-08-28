@@ -3,12 +3,14 @@ package service
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/nabil/book-store-system/internal/entity"
 	"github.com/nabil/book-store-system/internal/repository"
 	"github.com/nabil/book-store-system/pkg/helpers"
 	"github.com/nabil/book-store-system/pkg/logger"
 	"github.com/nabil/book-store-system/pkg/middleware"
+	"gorm.io/gorm"
 )
 
 // OrderItem represents an item in an order request
@@ -19,7 +21,7 @@ type OrderItem struct {
 
 type OrderService interface {
 	CreateOrder(items []OrderItem, token string) (*entity.Order, error)
-	GetOrders(token string, page, limit int) ([]*entity.Order, int64, error) 
+	GetOrders(token string, page, limit int) ([]*entity.Order, int64, error)
 	GetOrder(id uint, token string) (*entity.Order, error)
 	UpdateOrderStatus(id uint, status, token string) (*entity.Order, error)
 	ProcessPayment(orderID uint, token string) (string, error)
@@ -28,26 +30,29 @@ type OrderService interface {
 
 // orderServiceImpl implements the OrderService interface
 type orderServiceImpl struct {
-	orderRepo repository.OrderRepository
-	bookRepo  repository.BookRepository
-	userRepo  repository.UserRepository
-	auth      *middleware.AuthMiddleware
+	orderRepo  repository.OrderRepository
+	bookRepo   repository.BookRepository
+	userRepo   repository.UserRepository
+	txRepo     repository.TransactionRepository
+	auth       *middleware.AuthMiddleware
+	stockMutex sync.RWMutex
 }
 
-func NewOrderService(orderRepo repository.OrderRepository, bookRepo repository.BookRepository, userRepo repository.UserRepository) OrderService {
+func NewOrderService(orderRepo repository.OrderRepository, bookRepo repository.BookRepository, userRepo repository.UserRepository, txRepo repository.TransactionRepository) OrderService {
 	auth := middleware.NewAuthMiddleware(userRepo)
 	return &orderServiceImpl{
 		orderRepo: orderRepo,
 		bookRepo:  bookRepo,
 		userRepo:  userRepo,
 		auth:      auth,
+		txRepo:    txRepo,
 	}
 }
 
 // CreateOrder creates a new order with items
 func (s *orderServiceImpl) CreateOrder(items []OrderItem, token string) (*entity.Order, error) {
 	logger.Info("Starting order creation", "itemCount", len(items))
-	
+
 	// Validate user token
 	user, err := s.auth.ValidateUserToken(token)
 	if err != nil {
@@ -82,6 +87,7 @@ func (s *orderServiceImpl) CreateOrder(items []OrderItem, token string) (*entity
 			logger.Error("Order creation failed - stock check error", "userID", user.ID, "bookID", item.BookID, "error", err)
 			return nil, err
 		}
+
 		if !available {
 			logger.Error("Order creation failed - insufficient stock", "userID", user.ID, "bookID", item.BookID, "bookTitle", book.Title, "requestedQuantity", item.Quantity)
 			return nil, fmt.Errorf("insufficient stock for book: %s", book.Title)
@@ -107,20 +113,49 @@ func (s *orderServiceImpl) CreateOrder(items []OrderItem, token string) (*entity
 		Status:     "pending",
 	}
 
-	err = s.orderRepo.Create(order, orderItems)
-	if err != nil {
-		logger.Error("Failed to create order", "userID", user.ID, "totalAmount", totalAmount, "error", err)
-		return nil, err
-	}
-
-	// Update book stocks
-	for _, item := range items {
-		book, _ := s.bookRepo.GetByID(item.BookID)
-		newStock := book.Stock - item.Quantity
-		err := s.bookRepo.UpdateStock(item.BookID, newStock)
-		if err != nil {
-			logger.Error("Failed to update book stock after order creation", "orderID", order.ID, "bookID", item.BookID, "error", err)
+	err = s.txRepo.WithTransaction(func(tx *gorm.DB) error {
+		// Create order with transaction
+		if err := s.orderRepo.CreateOrderTx(tx, order, orderItems); err != nil {
+			logger.Error("Failed to create order in transaction", "userID", user.ID, "totalAmount", totalAmount, "error", err)
+			return err
 		}
+
+		// Update book stocks with transaction and mutex protection
+		for _, item := range items {
+			// Lock untuk melindungi operasi read-modify-write pada stock
+			s.stockMutex.Lock()
+			
+			book, err := s.bookRepo.GetByID(item.BookID)
+			if err != nil {
+				s.stockMutex.Unlock()
+				logger.Error("Failed to get book for stock update", "bookID", item.BookID, "error", err)
+				return err
+			}
+
+			// Cek apakah stock mencukupi
+			if book.Stock < item.Quantity {
+				s.stockMutex.Unlock()
+				logger.Error("Insufficient stock", "bookID", item.BookID, "available", book.Stock, "requested", item.Quantity)
+				return errors.New(fmt.Sprintf("insufficient stock for book ID %d", item.BookID))
+			}
+
+			newStock := book.Stock - item.Quantity
+			if err := s.bookRepo.UpdateStockTx(tx, item.BookID, newStock); err != nil {
+				s.stockMutex.Unlock()
+				logger.Error("Failed to update book stock in transaction", "orderID", order.ID, "bookID", item.BookID, "error", err)
+				return err
+			}
+			
+			s.stockMutex.Unlock()
+			logger.Info("Stock updated successfully", "bookID", item.BookID, "oldStock", book.Stock, "newStock", newStock)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		logger.Error("Transaction failed for order creation", "userID", user.ID, "totalAmount", totalAmount, "error", err)
+		return nil, err
 	}
 
 	// Load order with relations
@@ -137,7 +172,7 @@ func (s *orderServiceImpl) CreateOrder(items []OrderItem, token string) (*entity
 // GetOrders retrieves orders for a user with pagination
 func (s *orderServiceImpl) GetOrders(token string, page, limit int) ([]*entity.Order, int64, error) {
 	logger.Info("Getting user orders", "page", page, "limit", limit)
-	
+
 	// Validate user token
 	user, err := s.auth.ValidateUserToken(token)
 	if err != nil {
@@ -150,7 +185,7 @@ func (s *orderServiceImpl) GetOrders(token string, page, limit int) ([]*entity.O
 		logger.Error("Failed to get user orders", "userID", user.ID, "error", err)
 		return nil, 0, err
 	}
-	
+
 	logger.Info("Successfully retrieved user orders", "userID", user.ID, "count", len(orders), "total", total)
 	return orders, total, nil
 }
@@ -158,7 +193,7 @@ func (s *orderServiceImpl) GetOrders(token string, page, limit int) ([]*entity.O
 // GetOrder retrieves a specific order by ID
 func (s *orderServiceImpl) GetOrder(id uint, token string) (*entity.Order, error) {
 	logger.Info("Getting order by ID", "orderID", id)
-	
+
 	// Validate user token
 	user, err := s.auth.ValidateUserToken(token)
 	if err != nil {
@@ -186,7 +221,7 @@ func (s *orderServiceImpl) GetOrder(id uint, token string) (*entity.Order, error
 // UpdateOrderStatus updates order status (admin only)
 func (s *orderServiceImpl) UpdateOrderStatus(id uint, status, token string) (*entity.Order, error) {
 	logger.Info("Starting order status update", "orderID", id, "newStatus", status)
-	
+
 	// Validate admin token
 	_, err := s.auth.ValidateAdminToken(token)
 	if err != nil {
@@ -229,7 +264,7 @@ func (s *orderServiceImpl) UpdateOrderStatus(id uint, status, token string) (*en
 // ProcessPayment processes payment for an order
 func (s *orderServiceImpl) ProcessPayment(orderID uint, token string) (string, error) {
 	logger.Info("Starting payment processing", "orderID", orderID)
-	
+
 	// Validate user token
 	user, err := s.auth.ValidateUserToken(token)
 	if err != nil {
@@ -256,24 +291,28 @@ func (s *orderServiceImpl) ProcessPayment(orderID uint, token string) (string, e
 		return "", errors.New("order is not in pending status")
 	}
 
-	// Create payment using Midtrans
 	paymentURL, err := helpers.CreatePayment(order, order.OrderItems)
 	if err != nil {
 		logger.Error("Payment processing failed - payment creation error", "orderID", orderID, "error", err)
 		return "", err
 	}
 
-	// Update order payment URL
-	err = s.orderRepo.UpdatePaymentURL(orderID, paymentURL)
-	if err != nil {
-		logger.Error("Failed to update payment URL", "orderID", orderID, "error", err)
-		return "", err
-	}
+	err = s.txRepo.WithTransaction(func(tx *gorm.DB) error {
+		if err := s.orderRepo.UpdatePaymentURLTx(tx, orderID, paymentURL); err != nil {
+			logger.Error("Failed to update payment URL in transaction", "orderID", orderID, "error", err)
+			return err
+		}
 
-	// Update order status to processing
-	err = s.orderRepo.UpdateStatus(orderID, "processing")
+		if err := s.orderRepo.UpdateStatusTx(tx, orderID, "processing"); err != nil {
+			logger.Error("Failed to update order status in transaction", "orderID", orderID, "error", err)
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		logger.Error("Failed to update order status after payment creation", "orderID", orderID, "error", err)
+		logger.Error("Transaction failed for payment URL and status update", "orderID", orderID, "error", err)
 		return "", err
 	}
 
@@ -284,7 +323,7 @@ func (s *orderServiceImpl) ProcessPayment(orderID uint, token string) (string, e
 // GetAllOrders retrieves all orders with pagination (admin only)
 func (s *orderServiceImpl) GetAllOrders(token string, page, limit int) ([]*entity.Order, int64, error) {
 	logger.Info("Getting all orders (admin)", "page", page, "limit", limit)
-	
+
 	// Validate admin token
 	_, err := s.auth.ValidateAdminToken(token)
 	if err != nil {
@@ -297,7 +336,7 @@ func (s *orderServiceImpl) GetAllOrders(token string, page, limit int) ([]*entit
 		logger.Error("Failed to get all orders", "error", err)
 		return nil, 0, err
 	}
-	
+
 	logger.Info("Successfully retrieved all orders", "count", len(orders), "total", total)
 	return orders, total, nil
 }

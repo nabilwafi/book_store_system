@@ -55,18 +55,24 @@ func (g *GetSalesReportRequestDTO) ValidateGetSalesReportRequest() error {
 	return nil
 }
 
-// GetTopBooksRequestDTO represents the data transfer object for getting top books
 type GetTopBooksRequestDTO struct {
 	Limit int32  `json:"limit" validate:"omitempty,min=1,max=100"`
 	Token string `json:"token" validate:"required"`
 }
 
-// ValidateGetTopBooksRequest validates the GetTopBooksRequestDTO
 func (g *GetTopBooksRequestDTO) ValidateGetTopBooksRequest() error {
 	// Set default value if not provided
 	if g.Limit < 1 {
 		g.Limit = 10
 	}
 
+	return helpers.ValidateStruct(g)
+}
+
+type GetBookPriceStatisticsRequestDTO struct {
+	Token string `json:"token" validate:"required"`
+}
+
+func (g *GetBookPriceStatisticsRequestDTO) ValidateGetBookPriceStatisticsRequest() error {
 	return helpers.ValidateStruct(g)
 }

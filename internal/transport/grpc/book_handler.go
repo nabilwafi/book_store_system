@@ -5,6 +5,7 @@ import (
 
 	"github.com/nabil/book-store-system/internal/service"
 	"github.com/nabil/book-store-system/internal/transport/dto"
+	"github.com/nabil/book-store-system/pkg/helpers"
 	"github.com/nabil/book-store-system/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -88,7 +89,8 @@ func (h *BookHandler) GetBooks(ctx context.Context, req *proto.GetBooksRequest) 
 		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
 	}
 
-	books, total, err := h.bookService.GetBooks(int(req.Page), int(req.Limit), req.Search)
+	// Use validated DTO values instead of raw request values
+	books, total, err := h.bookService.GetBooks(int(getBooksDTO.Page), int(getBooksDTO.Limit), req.Search)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to get books: %v", err)
 	}
@@ -116,11 +118,18 @@ func (h *BookHandler) GetBooks(ctx context.Context, req *proto.GetBooksRequest) 
 		protoBooks = append(protoBooks, protoBook)
 	}
 
+	// Calculate pagination metadata using validated DTO values
+	paginationMeta := helpers.CalculatePaginationMetadata(int(getBooksDTO.Page), int(getBooksDTO.Limit), total)
+
 	return &proto.GetBooksResponse{
-		Success: true,
-		Message: "Books retrieved successfully",
-		Books:   protoBooks,
-		Total:   int32(total),
+		Success:     true,
+		Message:     "Books retrieved successfully",
+		Books:       protoBooks,
+		Total:       int32(total),
+		CurrentPage: paginationMeta.CurrentPage,
+		TotalPages:  paginationMeta.TotalPages,
+		HasNext:     paginationMeta.HasNext,
+		HasPrevious: paginationMeta.HasPrevious,
 	}, nil
 }
 
@@ -169,14 +178,15 @@ func (h *BookHandler) GetBook(ctx context.Context, req *proto.GetBookRequest) (*
 func (h *BookHandler) UpdateBook(ctx context.Context, req *proto.UpdateBookRequest) (*proto.UpdateBookResponse, error) {
 	// Validate request using DTO
 	updateDTO := &dto.UpdateBookRequestDTO{
-		ID:         req.Id,
-		Title:      req.Title,
-		Author:     req.Author,
-		Token:      req.Token,
-		Price:      req.Price,
-		Stock:      req.Stock,
-		Year:       req.Year,
-		CategoryID: req.CategoryId,
+		ID:          req.Id,
+		Title:       req.Title,
+		Author:      req.Author,
+		Token:       req.Token,
+		Price:       req.Price,
+		Stock:       req.Stock,
+		ImageBase64: req.ImageBase64,
+		Year:        req.Year,
+		CategoryID:  req.CategoryId,
 	}
 
 	if err := updateDTO.ValidateUpdateBookRequest(); err != nil {
@@ -254,7 +264,8 @@ func (h *BookHandler) GetBooksByCategory(ctx context.Context, req *proto.GetBook
 		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
 	}
 
-	books, total, err := h.bookService.GetBooksByCategory(uint(req.CategoryId), int(req.Page), int(req.Limit))
+	// Use validated DTO values instead of raw request values
+	books, total, err := h.bookService.GetBooksByCategory(uint(req.CategoryId), int(getBooksByCategoryDTO.Page), int(getBooksByCategoryDTO.Limit))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to get books by category: %v", err)
 	}
@@ -282,10 +293,17 @@ func (h *BookHandler) GetBooksByCategory(ctx context.Context, req *proto.GetBook
 		protoBooks = append(protoBooks, protoBook)
 	}
 
+	// Calculate pagination metadata using validated DTO values
+	paginationMeta := helpers.CalculatePaginationMetadata(int(getBooksByCategoryDTO.Page), int(getBooksByCategoryDTO.Limit), total)
+
 	return &proto.GetBooksByCategoryResponse{
-		Success: true,
-		Message: "Books retrieved successfully",
-		Books:   protoBooks,
-		Total:   int32(total),
+		Success:     true,
+		Message:     "Books retrieved successfully",
+		Books:       protoBooks,
+		Total:       int32(total),
+		CurrentPage: paginationMeta.CurrentPage,
+		TotalPages:  paginationMeta.TotalPages,
+		HasNext:     paginationMeta.HasNext,
+		HasPrevious: paginationMeta.HasPrevious,
 	}, nil
 }

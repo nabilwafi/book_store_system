@@ -11,6 +11,7 @@ import (
 type ReportRepository interface {
 	GetSalesReport(startDate, endDate time.Time) ([]*SalesReportItem, error)
 	GetTopBooks(limit int) ([]*TopBookItem, error)
+	GetBookPriceStatistics() (*BookPriceStatistics, error)
 }
 
 type SalesReportItem struct {
@@ -22,6 +23,13 @@ type SalesReportItem struct {
 type TopBookItem struct {
 	Book      entity.Book
 	TotalSold int
+}
+
+type BookPriceStatistics struct {
+	MaxPrice float64
+	MinPrice float64
+	AvgPrice float64
+	TotalBooks int
 }
 
 type reportRepositoryImpl struct {
@@ -36,28 +44,34 @@ func NewReportRepository(db *gorm.DB) ReportRepository {
 
 // GetSalesReport retrieves sales data for reporting
 func (r *reportRepositoryImpl) GetSalesReport(startDate, endDate time.Time) ([]*SalesReportItem, error) {
-	logger.Info("Generating sales report from %s to %s", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
+	logger.Infof("Generating sales report from %s to %s", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
 	var results []*SalesReportItem
+
+	// Set time to beginning of start date and end of end date
+	startOfDay := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, startDate.Location())
+	endOfDay := time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 23, 59, 59, 999999999, endDate.Location())
+
+	logger.Infof("Query range: %s to %s", startOfDay.Format("2006-01-02 15:04:05"), endOfDay.Format("2006-01-02 15:04:05"))
 
 	err := r.db.Model(&entity.Order{}).
 		Select("DATE(created_at) as date, SUM(total_price) as total_sales, COUNT(*) as total_orders").
-		Where("created_at BETWEEN ? AND ? AND status = ?", startDate, endDate, "completed").
+		Where("created_at >= ? AND created_at <= ? AND status = ?", startOfDay, endOfDay, "completed").
 		Group("DATE(created_at)").
 		Order("date").
 		Scan(&results).Error
 
 	if err != nil {
-		logger.Error("Failed to generate sales report: %v", err)
+		logger.Errorf("Failed to generate sales report: %v", err)
 		return nil, err
 	}
 
-	logger.Info("Successfully generated sales report with %d entries", len(results))
+	logger.Infof("Successfully generated sales report with %d entries", len(results))
 	return results, nil
 }
 
 // GetTopBooks retrieves top selling books
 func (r *reportRepositoryImpl) GetTopBooks(limit int) ([]*TopBookItem, error) {
-	logger.Info("Generating top books report with limit: %d", limit)
+	logger.Infof("Generating top books report with limit: %d", limit)
 	type BookWithSales struct {
 		entity.Book
 		TotalSold int `gorm:"column:total_sold"`
@@ -75,7 +89,7 @@ func (r *reportRepositoryImpl) GetTopBooks(limit int) ([]*TopBookItem, error) {
 		Scan(&bookResults).Error
 
 	if err != nil {
-		logger.Error("Failed to generate top books report: %v", err)
+		logger.Errorf("Failed to generate top books report: %v", err)
 		return nil, err
 	}
 
@@ -88,6 +102,26 @@ func (r *reportRepositoryImpl) GetTopBooks(limit int) ([]*TopBookItem, error) {
 		})
 	}
 
-	logger.Info("Successfully generated top books report with %d entries", len(results))
+	logger.Infof("Successfully generated top books report with %d entries", len(results))
 	return results, nil
+}
+
+// GetBookPriceStatistics retrieves book price statistics (max, min, avg)
+func (r *reportRepositoryImpl) GetBookPriceStatistics() (*BookPriceStatistics, error) {
+	logger.Info("Generating book price statistics")
+	var stats BookPriceStatistics
+
+	err := r.db.Model(&entity.Book{}).
+		Select("MAX(price) as max_price, MIN(price) as min_price, AVG(price) as avg_price, COUNT(*) as total_books").
+		Where("deleted_at IS NULL").
+		Scan(&stats).Error
+
+	if err != nil {
+		logger.Errorf("Failed to generate book price statistics: %v", err)
+		return nil, err
+	}
+
+	logger.Infof("Successfully generated book price statistics - Max: %.2f, Min: %.2f, Avg: %.2f, Total: %d", 
+		stats.MaxPrice, stats.MinPrice, stats.AvgPrice, stats.TotalBooks)
+	return &stats, nil
 }

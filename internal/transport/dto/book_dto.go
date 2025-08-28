@@ -8,9 +8,9 @@ type CreateBookRequestDTO struct {
 	Title       string  `json:"title" validate:"required,min=2,max=200"`
 	Author      string  `json:"author" validate:"required,min=2,max=100"`
 	ImageBase64 string  `json:"image_base64"`
+	Year        int32   `json:"year" validate:"required,min=1900,max=2025"`
 	Price       float64 `json:"price" validate:"required,min=0.01"`
 	Stock       int32   `json:"stock" validate:"required,min=0"`
-	Year        int32   `json:"year" validate:"required"`
 	CategoryID  uint32  `json:"category_id" validate:"required,min=1"`
 	Token       string  `json:"token" validate:"required"`
 }
@@ -21,14 +21,15 @@ func (c *CreateBookRequestDTO) ValidateCreateBookRequest() error {
 }
 
 type UpdateBookRequestDTO struct {
-	ID         uint32  `json:"id" validate:"required,min=1"`
-	Title      string  `json:"title" validate:"required,min=2,max=200"`
-	Author     string  `json:"author" validate:"required,min=2,max=100"`
-	Price      float64 `json:"price" validate:"required,min=0.01"`
-	Stock      int32   `json:"stock" validate:"required,min=0"`
-	Year       int32   `json:"year" validate:"required"`
-	CategoryID uint32  `json:"category_id" validate:"required,min=1"`
-	Token      string  `json:"token" validate:"required"`
+	ID          uint32  `json:"id" validate:"required,min=1"`
+	Title       string  `json:"title" validate:"required,min=2,max=200"`
+	Author      string  `json:"author" validate:"required,min=2,max=100"`
+	ImageBase64 string  `json:"image_base64"`
+	Year        int32   `json:"year" validate:"required,min=1900,max=2025"`
+	Price       float64 `json:"price" validate:"required,min=0.01"`
+	Stock       int32   `json:"stock" validate:"required,min=0"`
+	CategoryID  uint32  `json:"category_id" validate:"required,min=1"`
+	Token       string  `json:"token" validate:"required"`
 }
 
 // ValidateUpdateBookRequest validates the UpdateBookRequestDTO

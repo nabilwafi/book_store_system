@@ -43,6 +43,7 @@ service OrderService {
 service ReportService {
   rpc GetSalesReport(GetSalesReportRequest) returns (GetSalesReportResponse);
   rpc GetTopBooks(GetTopBooksRequest) returns (GetTopBooksResponse);
+  rpc GetBookPriceStatistics(GetBookPriceStatisticsRequest) returns (GetBookPriceStatisticsResponse);
 }
 
 // User messages
@@ -118,6 +119,10 @@ message GetCategoriesResponse {
   string message = 2;
   repeated Category categories = 3;
   int32 total = 4;
+  int32 current_page = 5;
+  int32 total_pages = 6;
+  bool has_next = 7;
+  bool has_previous = 8;
 }
 
 message GetCategoryRequest {
@@ -195,6 +200,10 @@ message GetBooksResponse {
   string message = 2;
   repeated Book books = 3;
   int32 total = 4;
+  int32 current_page = 5;
+  int32 total_pages = 6;
+  bool has_next = 7;
+  bool has_previous = 8;
 }
 
 message GetBookRequest {
@@ -246,6 +255,10 @@ message GetBooksByCategoryResponse {
   string message = 2;
   repeated Book books = 3;
   int32 total = 4;
+  int32 current_page = 5;
+  int32 total_pages = 6;
+  bool has_next = 7;
+  bool has_previous = 8;
 }
 
 // Order messages
@@ -296,6 +309,10 @@ message GetOrdersResponse {
   string message = 2;
   repeated Order orders = 3;
   int32 total = 4;
+  int32 current_page = 5;
+  int32 total_pages = 6;
+  bool has_next = 7;
+  bool has_previous = 8;
 }
 
 message GetOrderRequest {
@@ -366,4 +383,17 @@ message GetTopBooksResponse {
   bool success = 1;
   string message = 2;
   repeated TopBookItem books = 3;
+}
+
+message GetBookPriceStatisticsRequest {
+  string token = 1;
+}
+
+message GetBookPriceStatisticsResponse {
+  bool success = 1;
+  string message = 2;
+  double max_price = 3;
+  double min_price = 4;
+  double avg_price = 5;
+  int32 total_books = 6;
 }

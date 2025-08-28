@@ -1013,8 +1013,9 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	ReportService_GetSalesReport_FullMethodName = "/bookstore.ReportService/GetSalesReport"
-	ReportService_GetTopBooks_FullMethodName    = "/bookstore.ReportService/GetTopBooks"
+	ReportService_GetSalesReport_FullMethodName         = "/bookstore.ReportService/GetSalesReport"
+	ReportService_GetTopBooks_FullMethodName            = "/bookstore.ReportService/GetTopBooks"
+	ReportService_GetBookPriceStatistics_FullMethodName = "/bookstore.ReportService/GetBookPriceStatistics"
 )
 
 // ReportServiceClient is the client API for ReportService service.
@@ -1025,6 +1026,7 @@ const (
 type ReportServiceClient interface {
 	GetSalesReport(ctx context.Context, in *GetSalesReportRequest, opts ...grpc.CallOption) (*GetSalesReportResponse, error)
 	GetTopBooks(ctx context.Context, in *GetTopBooksRequest, opts ...grpc.CallOption) (*GetTopBooksResponse, error)
+	GetBookPriceStatistics(ctx context.Context, in *GetBookPriceStatisticsRequest, opts ...grpc.CallOption) (*GetBookPriceStatisticsResponse, error)
 }
 
 type reportServiceClient struct {
@@ -1055,6 +1057,16 @@ func (c *reportServiceClient) GetTopBooks(ctx context.Context, in *GetTopBooksRe
 	return out, nil
 }
 
+func (c *reportServiceClient) GetBookPriceStatistics(ctx context.Context, in *GetBookPriceStatisticsRequest, opts ...grpc.CallOption) (*GetBookPriceStatisticsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBookPriceStatisticsResponse)
+	err := c.cc.Invoke(ctx, ReportService_GetBookPriceStatistics_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReportServiceServer is the server API for ReportService service.
 // All implementations must embed UnimplementedReportServiceServer
 // for forward compatibility.
@@ -1063,6 +1075,7 @@ func (c *reportServiceClient) GetTopBooks(ctx context.Context, in *GetTopBooksRe
 type ReportServiceServer interface {
 	GetSalesReport(context.Context, *GetSalesReportRequest) (*GetSalesReportResponse, error)
 	GetTopBooks(context.Context, *GetTopBooksRequest) (*GetTopBooksResponse, error)
+	GetBookPriceStatistics(context.Context, *GetBookPriceStatisticsRequest) (*GetBookPriceStatisticsResponse, error)
 	mustEmbedUnimplementedReportServiceServer()
 }
 
@@ -1078,6 +1091,9 @@ func (UnimplementedReportServiceServer) GetSalesReport(context.Context, *GetSale
 }
 func (UnimplementedReportServiceServer) GetTopBooks(context.Context, *GetTopBooksRequest) (*GetTopBooksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTopBooks not implemented")
+}
+func (UnimplementedReportServiceServer) GetBookPriceStatistics(context.Context, *GetBookPriceStatisticsRequest) (*GetBookPriceStatisticsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBookPriceStatistics not implemented")
 }
 func (UnimplementedReportServiceServer) mustEmbedUnimplementedReportServiceServer() {}
 func (UnimplementedReportServiceServer) testEmbeddedByValue()                       {}
@@ -1136,6 +1152,24 @@ func _ReportService_GetTopBooks_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReportService_GetBookPriceStatistics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBookPriceStatisticsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportServiceServer).GetBookPriceStatistics(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReportService_GetBookPriceStatistics_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportServiceServer).GetBookPriceStatistics(ctx, req.(*GetBookPriceStatisticsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReportService_ServiceDesc is the grpc.ServiceDesc for ReportService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1150,6 +1184,10 @@ var ReportService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTopBooks",
 			Handler:    _ReportService_GetTopBooks_Handler,
+		},
+		{
+			MethodName: "GetBookPriceStatistics",
+			Handler:    _ReportService_GetBookPriceStatistics_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -689,6 +689,10 @@ type GetCategoriesResponse struct {
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	Categories    []*Category            `protobuf:"bytes,3,rep,name=categories,proto3" json:"categories,omitempty"`
 	Total         int32                  `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	CurrentPage   int32                  `protobuf:"varint,5,opt,name=current_page,json=currentPage,proto3" json:"current_page,omitempty"`
+	TotalPages    int32                  `protobuf:"varint,6,opt,name=total_pages,json=totalPages,proto3" json:"total_pages,omitempty"`
+	HasNext       bool                   `protobuf:"varint,7,opt,name=has_next,json=hasNext,proto3" json:"has_next,omitempty"`
+	HasPrevious   bool                   `protobuf:"varint,8,opt,name=has_previous,json=hasPrevious,proto3" json:"has_previous,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -749,6 +753,34 @@ func (x *GetCategoriesResponse) GetTotal() int32 {
 		return x.Total
 	}
 	return 0
+}
+
+func (x *GetCategoriesResponse) GetCurrentPage() int32 {
+	if x != nil {
+		return x.CurrentPage
+	}
+	return 0
+}
+
+func (x *GetCategoriesResponse) GetTotalPages() int32 {
+	if x != nil {
+		return x.TotalPages
+	}
+	return 0
+}
+
+func (x *GetCategoriesResponse) GetHasNext() bool {
+	if x != nil {
+		return x.HasNext
+	}
+	return false
+}
+
+func (x *GetCategoriesResponse) GetHasPrevious() bool {
+	if x != nil {
+		return x.HasPrevious
+	}
+	return false
 }
 
 type GetCategoryRequest struct {
@@ -1430,6 +1462,10 @@ type GetBooksResponse struct {
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	Books         []*Book                `protobuf:"bytes,3,rep,name=books,proto3" json:"books,omitempty"`
 	Total         int32                  `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	CurrentPage   int32                  `protobuf:"varint,5,opt,name=current_page,json=currentPage,proto3" json:"current_page,omitempty"`
+	TotalPages    int32                  `protobuf:"varint,6,opt,name=total_pages,json=totalPages,proto3" json:"total_pages,omitempty"`
+	HasNext       bool                   `protobuf:"varint,7,opt,name=has_next,json=hasNext,proto3" json:"has_next,omitempty"`
+	HasPrevious   bool                   `protobuf:"varint,8,opt,name=has_previous,json=hasPrevious,proto3" json:"has_previous,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1490,6 +1526,34 @@ func (x *GetBooksResponse) GetTotal() int32 {
 		return x.Total
 	}
 	return 0
+}
+
+func (x *GetBooksResponse) GetCurrentPage() int32 {
+	if x != nil {
+		return x.CurrentPage
+	}
+	return 0
+}
+
+func (x *GetBooksResponse) GetTotalPages() int32 {
+	if x != nil {
+		return x.TotalPages
+	}
+	return 0
+}
+
+func (x *GetBooksResponse) GetHasNext() bool {
+	if x != nil {
+		return x.HasNext
+	}
+	return false
+}
+
+func (x *GetBooksResponse) GetHasPrevious() bool {
+	if x != nil {
+		return x.HasPrevious
+	}
+	return false
 }
 
 type GetBookRequest struct {
@@ -1934,6 +1998,10 @@ type GetBooksByCategoryResponse struct {
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	Books         []*Book                `protobuf:"bytes,3,rep,name=books,proto3" json:"books,omitempty"`
 	Total         int32                  `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	CurrentPage   int32                  `protobuf:"varint,5,opt,name=current_page,json=currentPage,proto3" json:"current_page,omitempty"`
+	TotalPages    int32                  `protobuf:"varint,6,opt,name=total_pages,json=totalPages,proto3" json:"total_pages,omitempty"`
+	HasNext       bool                   `protobuf:"varint,7,opt,name=has_next,json=hasNext,proto3" json:"has_next,omitempty"`
+	HasPrevious   bool                   `protobuf:"varint,8,opt,name=has_previous,json=hasPrevious,proto3" json:"has_previous,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1994,6 +2062,34 @@ func (x *GetBooksByCategoryResponse) GetTotal() int32 {
 		return x.Total
 	}
 	return 0
+}
+
+func (x *GetBooksByCategoryResponse) GetCurrentPage() int32 {
+	if x != nil {
+		return x.CurrentPage
+	}
+	return 0
+}
+
+func (x *GetBooksByCategoryResponse) GetTotalPages() int32 {
+	if x != nil {
+		return x.TotalPages
+	}
+	return 0
+}
+
+func (x *GetBooksByCategoryResponse) GetHasNext() bool {
+	if x != nil {
+		return x.HasNext
+	}
+	return false
+}
+
+func (x *GetBooksByCategoryResponse) GetHasPrevious() bool {
+	if x != nil {
+		return x.HasPrevious
+	}
+	return false
 }
 
 // Order messages
@@ -2411,6 +2507,10 @@ type GetOrdersResponse struct {
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	Orders        []*Order               `protobuf:"bytes,3,rep,name=orders,proto3" json:"orders,omitempty"`
 	Total         int32                  `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	CurrentPage   int32                  `protobuf:"varint,5,opt,name=current_page,json=currentPage,proto3" json:"current_page,omitempty"`
+	TotalPages    int32                  `protobuf:"varint,6,opt,name=total_pages,json=totalPages,proto3" json:"total_pages,omitempty"`
+	HasNext       bool                   `protobuf:"varint,7,opt,name=has_next,json=hasNext,proto3" json:"has_next,omitempty"`
+	HasPrevious   bool                   `protobuf:"varint,8,opt,name=has_previous,json=hasPrevious,proto3" json:"has_previous,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2471,6 +2571,34 @@ func (x *GetOrdersResponse) GetTotal() int32 {
 		return x.Total
 	}
 	return 0
+}
+
+func (x *GetOrdersResponse) GetCurrentPage() int32 {
+	if x != nil {
+		return x.CurrentPage
+	}
+	return 0
+}
+
+func (x *GetOrdersResponse) GetTotalPages() int32 {
+	if x != nil {
+		return x.TotalPages
+	}
+	return 0
+}
+
+func (x *GetOrdersResponse) GetHasNext() bool {
+	if x != nil {
+		return x.HasNext
+	}
+	return false
+}
+
+func (x *GetOrdersResponse) GetHasPrevious() bool {
+	if x != nil {
+		return x.HasPrevious
+	}
+	return false
 }
 
 type GetOrderRequest struct {
@@ -3170,6 +3298,134 @@ func (x *GetTopBooksResponse) GetBooks() []*TopBookItem {
 	return nil
 }
 
+type GetBookPriceStatisticsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBookPriceStatisticsRequest) Reset() {
+	*x = GetBookPriceStatisticsRequest{}
+	mi := &file_proto_bookstore_proto_msgTypes[50]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBookPriceStatisticsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBookPriceStatisticsRequest) ProtoMessage() {}
+
+func (x *GetBookPriceStatisticsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_bookstore_proto_msgTypes[50]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBookPriceStatisticsRequest.ProtoReflect.Descriptor instead.
+func (*GetBookPriceStatisticsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_bookstore_proto_rawDescGZIP(), []int{50}
+}
+
+func (x *GetBookPriceStatisticsRequest) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type GetBookPriceStatisticsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	MaxPrice      float64                `protobuf:"fixed64,3,opt,name=max_price,json=maxPrice,proto3" json:"max_price,omitempty"`
+	MinPrice      float64                `protobuf:"fixed64,4,opt,name=min_price,json=minPrice,proto3" json:"min_price,omitempty"`
+	AvgPrice      float64                `protobuf:"fixed64,5,opt,name=avg_price,json=avgPrice,proto3" json:"avg_price,omitempty"`
+	TotalBooks    int32                  `protobuf:"varint,6,opt,name=total_books,json=totalBooks,proto3" json:"total_books,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBookPriceStatisticsResponse) Reset() {
+	*x = GetBookPriceStatisticsResponse{}
+	mi := &file_proto_bookstore_proto_msgTypes[51]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBookPriceStatisticsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBookPriceStatisticsResponse) ProtoMessage() {}
+
+func (x *GetBookPriceStatisticsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_bookstore_proto_msgTypes[51]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBookPriceStatisticsResponse.ProtoReflect.Descriptor instead.
+func (*GetBookPriceStatisticsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_bookstore_proto_rawDescGZIP(), []int{51}
+}
+
+func (x *GetBookPriceStatisticsResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetBookPriceStatisticsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetBookPriceStatisticsResponse) GetMaxPrice() float64 {
+	if x != nil {
+		return x.MaxPrice
+	}
+	return 0
+}
+
+func (x *GetBookPriceStatisticsResponse) GetMinPrice() float64 {
+	if x != nil {
+		return x.MinPrice
+	}
+	return 0
+}
+
+func (x *GetBookPriceStatisticsResponse) GetAvgPrice() float64 {
+	if x != nil {
+		return x.AvgPrice
+	}
+	return 0
+}
+
+func (x *GetBookPriceStatisticsResponse) GetTotalBooks() int32 {
+	if x != nil {
+		return x.TotalBooks
+	}
+	return 0
+}
+
 var File_proto_bookstore_proto protoreflect.FileDescriptor
 
 const file_proto_bookstore_proto_rawDesc = "" +
@@ -3222,14 +3478,19 @@ const file_proto_bookstore_proto_rawDesc = "" +
 	"\bcategory\x18\x03 \x01(\v2\x13.bookstore.CategoryR\bcategory\"@\n" +
 	"\x14GetCategoriesRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x05R\x05limit\"\x96\x01\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\"\x98\x02\n" +
 	"\x15GetCategoriesResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x123\n" +
 	"\n" +
 	"categories\x18\x03 \x03(\v2\x13.bookstore.CategoryR\n" +
 	"categories\x12\x14\n" +
-	"\x05total\x18\x04 \x01(\x05R\x05total\"$\n" +
+	"\x05total\x18\x04 \x01(\x05R\x05total\x12!\n" +
+	"\fcurrent_page\x18\x05 \x01(\x05R\vcurrentPage\x12\x1f\n" +
+	"\vtotal_pages\x18\x06 \x01(\x05R\n" +
+	"totalPages\x12\x19\n" +
+	"\bhas_next\x18\a \x01(\bR\ahasNext\x12!\n" +
+	"\fhas_previous\x18\b \x01(\bR\vhasPrevious\"$\n" +
 	"\x12GetCategoryRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"z\n" +
 	"\x13GetCategoryResponse\x12\x18\n" +
@@ -3283,12 +3544,17 @@ const file_proto_bookstore_proto_rawDesc = "" +
 	"\x0fGetBooksRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06search\x18\x03 \x01(\tR\x06search\"\x83\x01\n" +
+	"\x06search\x18\x03 \x01(\tR\x06search\"\x85\x02\n" +
 	"\x10GetBooksResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12%\n" +
 	"\x05books\x18\x03 \x03(\v2\x0f.bookstore.BookR\x05books\x12\x14\n" +
-	"\x05total\x18\x04 \x01(\x05R\x05total\" \n" +
+	"\x05total\x18\x04 \x01(\x05R\x05total\x12!\n" +
+	"\fcurrent_page\x18\x05 \x01(\x05R\vcurrentPage\x12\x1f\n" +
+	"\vtotal_pages\x18\x06 \x01(\x05R\n" +
+	"totalPages\x12\x19\n" +
+	"\bhas_next\x18\a \x01(\bR\ahasNext\x12!\n" +
+	"\fhas_previous\x18\b \x01(\bR\vhasPrevious\" \n" +
 	"\x0eGetBookRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"j\n" +
 	"\x0fGetBookResponse\x12\x18\n" +
@@ -3320,12 +3586,17 @@ const file_proto_bookstore_proto_rawDesc = "" +
 	"\vcategory_id\x18\x01 \x01(\rR\n" +
 	"categoryId\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x14\n" +
-	"\x05limit\x18\x03 \x01(\x05R\x05limit\"\x8d\x01\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\"\x8f\x02\n" +
 	"\x1aGetBooksByCategoryResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12%\n" +
 	"\x05books\x18\x03 \x03(\v2\x0f.bookstore.BookR\x05books\x12\x14\n" +
-	"\x05total\x18\x04 \x01(\x05R\x05total\"\x8b\x01\n" +
+	"\x05total\x18\x04 \x01(\x05R\x05total\x12!\n" +
+	"\fcurrent_page\x18\x05 \x01(\x05R\vcurrentPage\x12\x1f\n" +
+	"\vtotal_pages\x18\x06 \x01(\x05R\n" +
+	"totalPages\x12\x19\n" +
+	"\bhas_next\x18\a \x01(\bR\ahasNext\x12!\n" +
+	"\fhas_previous\x18\b \x01(\bR\vhasPrevious\"\x8b\x01\n" +
 	"\tOrderItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x17\n" +
 	"\abook_id\x18\x02 \x01(\rR\x06bookId\x12\x1a\n" +
@@ -3359,12 +3630,17 @@ const file_proto_bookstore_proto_rawDesc = "" +
 	"\x10GetOrdersRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x14\n" +
-	"\x05limit\x18\x03 \x01(\x05R\x05limit\"\x87\x01\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\"\x89\x02\n" +
 	"\x11GetOrdersResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12(\n" +
 	"\x06orders\x18\x03 \x03(\v2\x10.bookstore.OrderR\x06orders\x12\x14\n" +
-	"\x05total\x18\x04 \x01(\x05R\x05total\"7\n" +
+	"\x05total\x18\x04 \x01(\x05R\x05total\x12!\n" +
+	"\fcurrent_page\x18\x05 \x01(\x05R\vcurrentPage\x12\x1f\n" +
+	"\vtotal_pages\x18\x06 \x01(\x05R\n" +
+	"totalPages\x12\x19\n" +
+	"\bhas_next\x18\a \x01(\bR\ahasNext\x12!\n" +
+	"\fhas_previous\x18\b \x01(\bR\vhasPrevious\"7\n" +
 	"\x0fGetOrderRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\"n\n" +
@@ -3413,7 +3689,17 @@ const file_proto_bookstore_proto_rawDesc = "" +
 	"\x13GetTopBooksResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
-	"\x05books\x18\x03 \x03(\v2\x16.bookstore.TopBookItemR\x05books2\xd9\x01\n" +
+	"\x05books\x18\x03 \x03(\v2\x16.bookstore.TopBookItemR\x05books\"5\n" +
+	"\x1dGetBookPriceStatisticsRequest\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"\xcc\x01\n" +
+	"\x1eGetBookPriceStatisticsResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1b\n" +
+	"\tmax_price\x18\x03 \x01(\x01R\bmaxPrice\x12\x1b\n" +
+	"\tmin_price\x18\x04 \x01(\x01R\bminPrice\x12\x1b\n" +
+	"\tavg_price\x18\x05 \x01(\x01R\bavgPrice\x12\x1f\n" +
+	"\vtotal_books\x18\x06 \x01(\x05R\n" +
+	"totalBooks2\xd9\x01\n" +
 	"\vUserService\x12C\n" +
 	"\bRegister\x12\x1a.bookstore.RegisterRequest\x1a\x1b.bookstore.RegisterResponse\x12:\n" +
 	"\x05Login\x12\x17.bookstore.LoginRequest\x1a\x18.bookstore.LoginResponse\x12I\n" +
@@ -3440,10 +3726,11 @@ const file_proto_bookstore_proto_rawDesc = "" +
 	"\tGetOrders\x12\x1b.bookstore.GetOrdersRequest\x1a\x1c.bookstore.GetOrdersResponse\x12C\n" +
 	"\bGetOrder\x12\x1a.bookstore.GetOrderRequest\x1a\x1b.bookstore.GetOrderResponse\x12^\n" +
 	"\x11UpdateOrderStatus\x12#.bookstore.UpdateOrderStatusRequest\x1a$.bookstore.UpdateOrderStatusResponse\x12U\n" +
-	"\x0eProcessPayment\x12 .bookstore.ProcessPaymentRequest\x1a!.bookstore.ProcessPaymentResponse2\xb4\x01\n" +
+	"\x0eProcessPayment\x12 .bookstore.ProcessPaymentRequest\x1a!.bookstore.ProcessPaymentResponse2\xa3\x02\n" +
 	"\rReportService\x12U\n" +
 	"\x0eGetSalesReport\x12 .bookstore.GetSalesReportRequest\x1a!.bookstore.GetSalesReportResponse\x12L\n" +
-	"\vGetTopBooks\x12\x1d.bookstore.GetTopBooksRequest\x1a\x1e.bookstore.GetTopBooksResponseB*Z(github.com/nabil/book-store-system/protob\x06proto3"
+	"\vGetTopBooks\x12\x1d.bookstore.GetTopBooksRequest\x1a\x1e.bookstore.GetTopBooksResponse\x12m\n" +
+	"\x16GetBookPriceStatistics\x12(.bookstore.GetBookPriceStatisticsRequest\x1a).bookstore.GetBookPriceStatisticsResponseB*Z(github.com/nabil/book-store-system/protob\x06proto3"
 
 var (
 	file_proto_bookstore_proto_rawDescOnce sync.Once
@@ -3457,58 +3744,60 @@ func file_proto_bookstore_proto_rawDescGZIP() []byte {
 	return file_proto_bookstore_proto_rawDescData
 }
 
-var file_proto_bookstore_proto_msgTypes = make([]protoimpl.MessageInfo, 50)
+var file_proto_bookstore_proto_msgTypes = make([]protoimpl.MessageInfo, 52)
 var file_proto_bookstore_proto_goTypes = []any{
-	(*User)(nil),                       // 0: bookstore.User
-	(*RegisterRequest)(nil),            // 1: bookstore.RegisterRequest
-	(*RegisterResponse)(nil),           // 2: bookstore.RegisterResponse
-	(*LoginRequest)(nil),               // 3: bookstore.LoginRequest
-	(*LoginResponse)(nil),              // 4: bookstore.LoginResponse
-	(*GetProfileRequest)(nil),          // 5: bookstore.GetProfileRequest
-	(*GetProfileResponse)(nil),         // 6: bookstore.GetProfileResponse
-	(*Category)(nil),                   // 7: bookstore.Category
-	(*CreateCategoryRequest)(nil),      // 8: bookstore.CreateCategoryRequest
-	(*CreateCategoryResponse)(nil),     // 9: bookstore.CreateCategoryResponse
-	(*GetCategoriesRequest)(nil),       // 10: bookstore.GetCategoriesRequest
-	(*GetCategoriesResponse)(nil),      // 11: bookstore.GetCategoriesResponse
-	(*GetCategoryRequest)(nil),         // 12: bookstore.GetCategoryRequest
-	(*GetCategoryResponse)(nil),        // 13: bookstore.GetCategoryResponse
-	(*UpdateCategoryRequest)(nil),      // 14: bookstore.UpdateCategoryRequest
-	(*UpdateCategoryResponse)(nil),     // 15: bookstore.UpdateCategoryResponse
-	(*DeleteCategoryRequest)(nil),      // 16: bookstore.DeleteCategoryRequest
-	(*DeleteCategoryResponse)(nil),     // 17: bookstore.DeleteCategoryResponse
-	(*Book)(nil),                       // 18: bookstore.Book
-	(*CreateBookRequest)(nil),          // 19: bookstore.CreateBookRequest
-	(*CreateBookResponse)(nil),         // 20: bookstore.CreateBookResponse
-	(*GetBooksRequest)(nil),            // 21: bookstore.GetBooksRequest
-	(*GetBooksResponse)(nil),           // 22: bookstore.GetBooksResponse
-	(*GetBookRequest)(nil),             // 23: bookstore.GetBookRequest
-	(*GetBookResponse)(nil),            // 24: bookstore.GetBookResponse
-	(*UpdateBookRequest)(nil),          // 25: bookstore.UpdateBookRequest
-	(*UpdateBookResponse)(nil),         // 26: bookstore.UpdateBookResponse
-	(*DeleteBookRequest)(nil),          // 27: bookstore.DeleteBookRequest
-	(*DeleteBookResponse)(nil),         // 28: bookstore.DeleteBookResponse
-	(*GetBooksByCategoryRequest)(nil),  // 29: bookstore.GetBooksByCategoryRequest
-	(*GetBooksByCategoryResponse)(nil), // 30: bookstore.GetBooksByCategoryResponse
-	(*OrderItem)(nil),                  // 31: bookstore.OrderItem
-	(*Order)(nil),                      // 32: bookstore.Order
-	(*CreateOrderRequest)(nil),         // 33: bookstore.CreateOrderRequest
-	(*OrderItemRequest)(nil),           // 34: bookstore.OrderItemRequest
-	(*CreateOrderResponse)(nil),        // 35: bookstore.CreateOrderResponse
-	(*GetOrdersRequest)(nil),           // 36: bookstore.GetOrdersRequest
-	(*GetOrdersResponse)(nil),          // 37: bookstore.GetOrdersResponse
-	(*GetOrderRequest)(nil),            // 38: bookstore.GetOrderRequest
-	(*GetOrderResponse)(nil),           // 39: bookstore.GetOrderResponse
-	(*UpdateOrderStatusRequest)(nil),   // 40: bookstore.UpdateOrderStatusRequest
-	(*UpdateOrderStatusResponse)(nil),  // 41: bookstore.UpdateOrderStatusResponse
-	(*ProcessPaymentRequest)(nil),      // 42: bookstore.ProcessPaymentRequest
-	(*ProcessPaymentResponse)(nil),     // 43: bookstore.ProcessPaymentResponse
-	(*SalesReportItem)(nil),            // 44: bookstore.SalesReportItem
-	(*GetSalesReportRequest)(nil),      // 45: bookstore.GetSalesReportRequest
-	(*GetSalesReportResponse)(nil),     // 46: bookstore.GetSalesReportResponse
-	(*TopBookItem)(nil),                // 47: bookstore.TopBookItem
-	(*GetTopBooksRequest)(nil),         // 48: bookstore.GetTopBooksRequest
-	(*GetTopBooksResponse)(nil),        // 49: bookstore.GetTopBooksResponse
+	(*User)(nil),                           // 0: bookstore.User
+	(*RegisterRequest)(nil),                // 1: bookstore.RegisterRequest
+	(*RegisterResponse)(nil),               // 2: bookstore.RegisterResponse
+	(*LoginRequest)(nil),                   // 3: bookstore.LoginRequest
+	(*LoginResponse)(nil),                  // 4: bookstore.LoginResponse
+	(*GetProfileRequest)(nil),              // 5: bookstore.GetProfileRequest
+	(*GetProfileResponse)(nil),             // 6: bookstore.GetProfileResponse
+	(*Category)(nil),                       // 7: bookstore.Category
+	(*CreateCategoryRequest)(nil),          // 8: bookstore.CreateCategoryRequest
+	(*CreateCategoryResponse)(nil),         // 9: bookstore.CreateCategoryResponse
+	(*GetCategoriesRequest)(nil),           // 10: bookstore.GetCategoriesRequest
+	(*GetCategoriesResponse)(nil),          // 11: bookstore.GetCategoriesResponse
+	(*GetCategoryRequest)(nil),             // 12: bookstore.GetCategoryRequest
+	(*GetCategoryResponse)(nil),            // 13: bookstore.GetCategoryResponse
+	(*UpdateCategoryRequest)(nil),          // 14: bookstore.UpdateCategoryRequest
+	(*UpdateCategoryResponse)(nil),         // 15: bookstore.UpdateCategoryResponse
+	(*DeleteCategoryRequest)(nil),          // 16: bookstore.DeleteCategoryRequest
+	(*DeleteCategoryResponse)(nil),         // 17: bookstore.DeleteCategoryResponse
+	(*Book)(nil),                           // 18: bookstore.Book
+	(*CreateBookRequest)(nil),              // 19: bookstore.CreateBookRequest
+	(*CreateBookResponse)(nil),             // 20: bookstore.CreateBookResponse
+	(*GetBooksRequest)(nil),                // 21: bookstore.GetBooksRequest
+	(*GetBooksResponse)(nil),               // 22: bookstore.GetBooksResponse
+	(*GetBookRequest)(nil),                 // 23: bookstore.GetBookRequest
+	(*GetBookResponse)(nil),                // 24: bookstore.GetBookResponse
+	(*UpdateBookRequest)(nil),              // 25: bookstore.UpdateBookRequest
+	(*UpdateBookResponse)(nil),             // 26: bookstore.UpdateBookResponse
+	(*DeleteBookRequest)(nil),              // 27: bookstore.DeleteBookRequest
+	(*DeleteBookResponse)(nil),             // 28: bookstore.DeleteBookResponse
+	(*GetBooksByCategoryRequest)(nil),      // 29: bookstore.GetBooksByCategoryRequest
+	(*GetBooksByCategoryResponse)(nil),     // 30: bookstore.GetBooksByCategoryResponse
+	(*OrderItem)(nil),                      // 31: bookstore.OrderItem
+	(*Order)(nil),                          // 32: bookstore.Order
+	(*CreateOrderRequest)(nil),             // 33: bookstore.CreateOrderRequest
+	(*OrderItemRequest)(nil),               // 34: bookstore.OrderItemRequest
+	(*CreateOrderResponse)(nil),            // 35: bookstore.CreateOrderResponse
+	(*GetOrdersRequest)(nil),               // 36: bookstore.GetOrdersRequest
+	(*GetOrdersResponse)(nil),              // 37: bookstore.GetOrdersResponse
+	(*GetOrderRequest)(nil),                // 38: bookstore.GetOrderRequest
+	(*GetOrderResponse)(nil),               // 39: bookstore.GetOrderResponse
+	(*UpdateOrderStatusRequest)(nil),       // 40: bookstore.UpdateOrderStatusRequest
+	(*UpdateOrderStatusResponse)(nil),      // 41: bookstore.UpdateOrderStatusResponse
+	(*ProcessPaymentRequest)(nil),          // 42: bookstore.ProcessPaymentRequest
+	(*ProcessPaymentResponse)(nil),         // 43: bookstore.ProcessPaymentResponse
+	(*SalesReportItem)(nil),                // 44: bookstore.SalesReportItem
+	(*GetSalesReportRequest)(nil),          // 45: bookstore.GetSalesReportRequest
+	(*GetSalesReportResponse)(nil),         // 46: bookstore.GetSalesReportResponse
+	(*TopBookItem)(nil),                    // 47: bookstore.TopBookItem
+	(*GetTopBooksRequest)(nil),             // 48: bookstore.GetTopBooksRequest
+	(*GetTopBooksResponse)(nil),            // 49: bookstore.GetTopBooksResponse
+	(*GetBookPriceStatisticsRequest)(nil),  // 50: bookstore.GetBookPriceStatisticsRequest
+	(*GetBookPriceStatisticsResponse)(nil), // 51: bookstore.GetBookPriceStatisticsResponse
 }
 var file_proto_bookstore_proto_depIdxs = []int32{
 	0,  // 0: bookstore.RegisterResponse.user:type_name -> bookstore.User
@@ -3556,29 +3845,31 @@ var file_proto_bookstore_proto_depIdxs = []int32{
 	42, // 42: bookstore.OrderService.ProcessPayment:input_type -> bookstore.ProcessPaymentRequest
 	45, // 43: bookstore.ReportService.GetSalesReport:input_type -> bookstore.GetSalesReportRequest
 	48, // 44: bookstore.ReportService.GetTopBooks:input_type -> bookstore.GetTopBooksRequest
-	2,  // 45: bookstore.UserService.Register:output_type -> bookstore.RegisterResponse
-	4,  // 46: bookstore.UserService.Login:output_type -> bookstore.LoginResponse
-	6,  // 47: bookstore.UserService.GetProfile:output_type -> bookstore.GetProfileResponse
-	9,  // 48: bookstore.CategoryService.CreateCategory:output_type -> bookstore.CreateCategoryResponse
-	11, // 49: bookstore.CategoryService.GetCategories:output_type -> bookstore.GetCategoriesResponse
-	13, // 50: bookstore.CategoryService.GetCategory:output_type -> bookstore.GetCategoryResponse
-	15, // 51: bookstore.CategoryService.UpdateCategory:output_type -> bookstore.UpdateCategoryResponse
-	17, // 52: bookstore.CategoryService.DeleteCategory:output_type -> bookstore.DeleteCategoryResponse
-	20, // 53: bookstore.BookService.CreateBook:output_type -> bookstore.CreateBookResponse
-	22, // 54: bookstore.BookService.GetBooks:output_type -> bookstore.GetBooksResponse
-	24, // 55: bookstore.BookService.GetBook:output_type -> bookstore.GetBookResponse
-	26, // 56: bookstore.BookService.UpdateBook:output_type -> bookstore.UpdateBookResponse
-	28, // 57: bookstore.BookService.DeleteBook:output_type -> bookstore.DeleteBookResponse
-	30, // 58: bookstore.BookService.GetBooksByCategory:output_type -> bookstore.GetBooksByCategoryResponse
-	35, // 59: bookstore.OrderService.CreateOrder:output_type -> bookstore.CreateOrderResponse
-	37, // 60: bookstore.OrderService.GetOrders:output_type -> bookstore.GetOrdersResponse
-	39, // 61: bookstore.OrderService.GetOrder:output_type -> bookstore.GetOrderResponse
-	41, // 62: bookstore.OrderService.UpdateOrderStatus:output_type -> bookstore.UpdateOrderStatusResponse
-	43, // 63: bookstore.OrderService.ProcessPayment:output_type -> bookstore.ProcessPaymentResponse
-	46, // 64: bookstore.ReportService.GetSalesReport:output_type -> bookstore.GetSalesReportResponse
-	49, // 65: bookstore.ReportService.GetTopBooks:output_type -> bookstore.GetTopBooksResponse
-	45, // [45:66] is the sub-list for method output_type
-	24, // [24:45] is the sub-list for method input_type
+	50, // 45: bookstore.ReportService.GetBookPriceStatistics:input_type -> bookstore.GetBookPriceStatisticsRequest
+	2,  // 46: bookstore.UserService.Register:output_type -> bookstore.RegisterResponse
+	4,  // 47: bookstore.UserService.Login:output_type -> bookstore.LoginResponse
+	6,  // 48: bookstore.UserService.GetProfile:output_type -> bookstore.GetProfileResponse
+	9,  // 49: bookstore.CategoryService.CreateCategory:output_type -> bookstore.CreateCategoryResponse
+	11, // 50: bookstore.CategoryService.GetCategories:output_type -> bookstore.GetCategoriesResponse
+	13, // 51: bookstore.CategoryService.GetCategory:output_type -> bookstore.GetCategoryResponse
+	15, // 52: bookstore.CategoryService.UpdateCategory:output_type -> bookstore.UpdateCategoryResponse
+	17, // 53: bookstore.CategoryService.DeleteCategory:output_type -> bookstore.DeleteCategoryResponse
+	20, // 54: bookstore.BookService.CreateBook:output_type -> bookstore.CreateBookResponse
+	22, // 55: bookstore.BookService.GetBooks:output_type -> bookstore.GetBooksResponse
+	24, // 56: bookstore.BookService.GetBook:output_type -> bookstore.GetBookResponse
+	26, // 57: bookstore.BookService.UpdateBook:output_type -> bookstore.UpdateBookResponse
+	28, // 58: bookstore.BookService.DeleteBook:output_type -> bookstore.DeleteBookResponse
+	30, // 59: bookstore.BookService.GetBooksByCategory:output_type -> bookstore.GetBooksByCategoryResponse
+	35, // 60: bookstore.OrderService.CreateOrder:output_type -> bookstore.CreateOrderResponse
+	37, // 61: bookstore.OrderService.GetOrders:output_type -> bookstore.GetOrdersResponse
+	39, // 62: bookstore.OrderService.GetOrder:output_type -> bookstore.GetOrderResponse
+	41, // 63: bookstore.OrderService.UpdateOrderStatus:output_type -> bookstore.UpdateOrderStatusResponse
+	43, // 64: bookstore.OrderService.ProcessPayment:output_type -> bookstore.ProcessPaymentResponse
+	46, // 65: bookstore.ReportService.GetSalesReport:output_type -> bookstore.GetSalesReportResponse
+	49, // 66: bookstore.ReportService.GetTopBooks:output_type -> bookstore.GetTopBooksResponse
+	51, // 67: bookstore.ReportService.GetBookPriceStatistics:output_type -> bookstore.GetBookPriceStatisticsResponse
+	46, // [46:68] is the sub-list for method output_type
+	24, // [24:46] is the sub-list for method input_type
 	24, // [24:24] is the sub-list for extension type_name
 	24, // [24:24] is the sub-list for extension extendee
 	0,  // [0:24] is the sub-list for field type_name
@@ -3595,7 +3886,7 @@ func file_proto_bookstore_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_bookstore_proto_rawDesc), len(file_proto_bookstore_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   50,
+			NumMessages:   52,
 			NumExtensions: 0,
 			NumServices:   5,
 		},

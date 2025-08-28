@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/midtrans/midtrans-go"
@@ -8,18 +9,18 @@ import (
 	"github.com/nabil/book-store-system/config"
 	"github.com/nabil/book-store-system/internal/entity"
 	"github.com/nabil/book-store-system/pkg/logger"
+	"github.com/sony/gobreaker"
 )
 
-// InitMidtrans initializes Midtrans client
 func InitMidtrans() {
 	cfg := config.LoadConfig()
 	midtrans.ServerKey = cfg.MidtransKey
-	midtrans.Environment = midtrans.Sandbox // Change to midtrans.Production in production
+	midtrans.Environment = midtrans.Sandbox
+
+	InitPaymentCircuitBreaker()
 }
 
-// CreatePayment creates a payment transaction in Midtrans
 func CreatePayment(order *entity.Order, items []entity.OrderItem) (string, error) {
-	// Add item details and calculate total
 	var itemDetails []midtrans.ItemDetails
 	var calculatedTotal int64
 
@@ -38,7 +39,6 @@ func CreatePayment(order *entity.Order, items []entity.OrderItem) (string, error
 		calculatedTotal += itemTotal
 	}
 
-	// Create transaction details using calculated total to ensure consistency
 	req := &snap.Request{
 		TransactionDetails: midtrans.TransactionDetails{
 			OrderID:  strconv.Itoa(int(order.ID)),
@@ -50,21 +50,42 @@ func CreatePayment(order *entity.Order, items []entity.OrderItem) (string, error
 		Items: &itemDetails,
 	}
 
-	// Create Snap transaction
-	resp, err := snap.CreateTransaction(req)
+	// Execute payment creation with circuit breaker protection
+	result, err := ExecuteWithCircuitBreaker(PaymentCircuitBreaker, func() (interface{}, error) {
+		resp, err := snap.CreateTransaction(req)
+		if err != nil {
+			logger.Errorf("Failed to create payment transaction: %v", err)
+			return nil, err
+		}
+		return resp, nil
+	})
+
 	if err != nil {
-		logger.Errorf("Failed to create payment transaction: %v", err)
+		// Check if error is from circuit breaker
+		if err == gobreaker.ErrOpenState {
+			logger.Errorf("Payment service circuit breaker is open - service temporarily unavailable")
+			return "", errors.New("payment service temporarily unavailable, please try again later")
+		}
+
+		if err == gobreaker.ErrTooManyRequests {
+			logger.Errorf("Payment service circuit breaker - too many requests")
+			return "", errors.New("payment service is busy, please try again later")
+		}
+
 		return "", err
+	}
+
+	resp, ok := result.(*snap.Response)
+	if !ok {
+		logger.Errorf("Invalid response type from payment service")
+		return "", errors.New("invalid response from payment service")
 	}
 
 	logger.Infof("Payment transaction created for order %d", order.ID)
 	return resp.RedirectURL, nil
 }
 
-// SimulatePayment simulates payment completion (for testing)
 func SimulatePayment(orderID string) bool {
-	// In real implementation, this would verify with Midtrans
-	// For now, we'll just simulate success
 	logger.Infof("Payment simulation completed for order %s", orderID)
 	return true
 }

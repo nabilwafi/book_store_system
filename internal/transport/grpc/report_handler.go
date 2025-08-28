@@ -122,3 +122,30 @@ func (h *ReportHandler) GetTopBooks(ctx context.Context, req *proto.GetTopBooksR
 		Books:   protoItems,
 	}, nil
 }
+
+// GetBookPriceStatistics retrieves book price statistics (admin only)
+func (h *ReportHandler) GetBookPriceStatistics(ctx context.Context, req *proto.GetBookPriceStatisticsRequest) (*proto.GetBookPriceStatisticsResponse, error) {
+	// Validate request using DTO
+	priceStatsDTO := &dto.GetBookPriceStatisticsRequestDTO{
+		Token: req.Token,
+	}
+	
+	if err := priceStatsDTO.ValidateGetBookPriceStatisticsRequest(); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
+	}
+	
+	// Get book price statistics
+	stats, err := h.reportService.GetBookPriceStatistics(req.Token)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to get book price statistics: %v", err)
+	}
+	
+	return &proto.GetBookPriceStatisticsResponse{
+		Success:    true,
+		Message:    "Book price statistics retrieved successfully",
+		MaxPrice:   stats.MaxPrice,
+		MinPrice:   stats.MinPrice,
+		AvgPrice:   stats.AvgPrice,
+		TotalBooks: int32(stats.TotalBooks),
+	}, nil
+}

@@ -2,8 +2,10 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/nabil/book-store-system/internal/transport/dto"
 	"github.com/nabil/book-store-system/internal/service"
+	"github.com/nabil/book-store-system/pkg/helpers"
 	"github.com/nabil/book-store-system/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -108,11 +110,12 @@ func (h *OrderHandler) GetOrders(ctx context.Context, req *proto.GetOrdersReques
 		return nil, status.Errorf(codes.InvalidArgument, "Validation failed: %v", err)
 	}
 	
-	orders, total, err := h.orderService.GetOrders(req.Token, int(req.Page), int(req.Limit))
+	// Use validated DTO values instead of raw request values
+	orders, total, err := h.orderService.GetOrders(req.Token, int(getOrdersDTO.Page), int(getOrdersDTO.Limit))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to get orders: %v", err)
 	}
-	
+
 	var protoOrders []*proto.Order
 	for _, order := range orders {
 		// Convert order items to proto
@@ -152,11 +155,18 @@ func (h *OrderHandler) GetOrders(ctx context.Context, req *proto.GetOrdersReques
 		protoOrders = append(protoOrders, protoOrder)
 	}
 	
+	// Calculate pagination metadata using validated DTO values
+	paginationMeta := helpers.CalculatePaginationMetadata(int(getOrdersDTO.Page), int(getOrdersDTO.Limit), total)
+
 	return &proto.GetOrdersResponse{
-		Success: true,
-		Message: "Orders retrieved successfully",
-		Orders:  protoOrders,
-		Total:   int32(total),
+		Success:      true,
+		Message:      "Orders retrieved successfully",
+		Orders:       protoOrders,
+		Total:        int32(total),
+		CurrentPage:  paginationMeta.CurrentPage,
+		TotalPages:   paginationMeta.TotalPages,
+		HasNext:      paginationMeta.HasNext,
+		HasPrevious:  paginationMeta.HasPrevious,
 	}, nil
 }
 
